@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: greeter-client
+    k8s-app-project: demo
+  name: greeter-client
+spec:
+  selector:
+    matchLabels:
+      k8s-app: greeter-client
+      k8s-app-project: demo
+  template:
+    metadata:
+      labels:
+        k8s-app: greeter-client
+        k8s-app-project: demo
+      name: greeter-client
+    spec:
+      containers:
+        - command:
+          - /usr/local/bin/greeter_client
+          args:
+            - --address
+            - greeter-server.sendinfo.svc:50051
+            - --timeout
+            - "1"
+          env:
+            - name: GRPC_GO_RETRY
+              value: "on"
+          image: docker.io/yangxikun/go-grpc-client-side-lb-example:0.1
+          imagePullPolicy: Always
+          name: client
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 100Mi
+            requests:
+              cpu: "0.5"
+              memory: 100Mi
+      restartPolicy: Always

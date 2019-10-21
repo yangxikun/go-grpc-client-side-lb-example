@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: greeter-server
+    k8s-app-project: demo
+  name: greeter-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      k8s-app: greeter-server
+      k8s-app-project: demo
+  template:
+    metadata:
+      labels:
+        k8s-app: greeter-server
+        k8s-app-project: demo
+      name: greeter-server
+    spec:
+      containers:
+        - command:
+          - /usr/local/bin/greeter_server
+          image: docker.io/yangxikun/go-grpc-client-side-lb-example:0.1
+          imagePullPolicy: Always
+          name: server
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 100Mi
+            requests:
+              cpu: "0.5"
+              memory: 100Mi
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: greeter-server
+  name: greeter-server
+spec:
+  clusterIP: None
+  ports:
+    - name: grpc
+      port: 50051
+      protocol: TCP
+      targetPort: 50051
+  selector:
+    k8s-app: greeter-server
+    k8s-app-project: demo
